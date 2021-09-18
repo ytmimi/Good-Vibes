@@ -1,7 +1,7 @@
 use flexi_logger::Logger;
 use rand::prelude::*;
 use std::fs::File;
-use std::io::{BufReader};
+use std::io::BufReader;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 use structopt::StructOpt;
@@ -60,12 +60,17 @@ struct Cli {
         parse(try_from_str = try_log_level),
         help = "Log Level. Select one of 'trace', 'debug', 'info', 'warn', or 'error'."
     )]
-    log_level: Option<String>
+    log_level: Option<String>,
 }
 
 #[tokio::main]
 async fn main() {
-    let Cli { host, port, vibes , log_level} = Cli::from_args();
+    let Cli {
+        host,
+        port,
+        vibes,
+        log_level,
+    } = Cli::from_args();
 
     if let Some(level) = log_level {
         // based on try_log_level we know that we'll only get a valid log level
