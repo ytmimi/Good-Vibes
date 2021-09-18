@@ -1,3 +1,4 @@
+use flexi_logger::Logger;
 use rand::prelude::*;
 use std::fs::File;
 use std::io::{BufReader};
@@ -22,6 +23,18 @@ fn try_from_file_path(file_path: &str) -> std::io::Result<Vibes> {
     Ok(Vibes(good_vibes))
 }
 
+fn try_log_level(level: &str) -> Result<String, String> {
+    match level {
+        "trace" | "debug" | "info" | "warn" | "error" => Ok(level.to_owned()),
+        _ => Err(
+            format!(
+                "{} is not a valid log level. Select one of 'trace', 'debug', 'info', 'warn', or 'error'.",
+                level
+            )
+        )
+    }
+}
+
 #[derive(StructOpt)]
 struct Cli {
     #[structopt(
@@ -42,11 +55,25 @@ struct Cli {
         help = "Path a JSON File with a list of positive messages!"
     )]
     vibes: Vibes,
+    #[structopt(
+        long = "--log-level",
+        parse(try_from_str = try_log_level),
+        help = "Log Level. Select one of 'trace', 'debug', 'info', 'warn', or 'error'."
+    )]
+    log_level: Option<String>
 }
 
 #[tokio::main]
 async fn main() {
-    let Cli { host, port, vibes } = Cli::from_args();
+    let Cli { host, port, vibes , log_level} = Cli::from_args();
+
+    if let Some(level) = log_level {
+        // based on try_log_level we know that we'll only get a valid log level
+        Logger::try_with_str(level)
+            .unwrap()
+            .start()
+            .expect("Setting up logger failed");
+    }
 
     let vibes = Arc::new(vibes);
 
