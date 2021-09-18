@@ -1,6 +1,6 @@
 use rand::prelude::*;
 use std::fs::File;
-use std::io::{BufReader, Result};
+use std::io::{BufReader};
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 use structopt::StructOpt;
@@ -15,7 +15,7 @@ impl Vibes {
     }
 }
 
-fn try_from_file_path(file_path: &str) -> Result<Vibes> {
+fn try_from_file_path(file_path: &str) -> std::io::Result<Vibes> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
     let good_vibes: Vec<String> = serde_json::from_reader(reader)?;
